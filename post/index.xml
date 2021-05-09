@@ -6,14 +6,14 @@
     <description>Recent content in Posts on Project 3</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-US</language>
-    <lastBuildDate>Fri, 07 May 2021 00:00:00 +0000</lastBuildDate><atom:link href="/post/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Sun, 09 May 2021 00:00:00 +0000</lastBuildDate><atom:link href="/post/index.xml" rel="self" type="application/rss+xml" />
     <item>
-      <title>Test Blog</title>
-      <link>/post/2021/05/07/test-blog/</link>
-      <pubDate>Fri, 07 May 2021 00:00:00 +0000</pubDate>
+      <title>Python</title>
+      <link>/post/2021/05/09/python/</link>
+      <pubDate>Sun, 09 May 2021 00:00:00 +0000</pubDate>
       
-      <guid>/post/2021/05/07/test-blog/</guid>
-      <description>hello my name is desiree is this working Link to project 1 Link to google</description>
+      <guid>/post/2021/05/09/python/</guid>
+      <description>library(reticulate) name &amp;lt;- &amp;quot;Desiree&amp;quot; school&amp;lt;-&amp;quot;UT&amp;quot; area&amp;lt;-&amp;quot;Austin&amp;quot; cat(c(name,py$name)) ## Desiree cat(c(name,py$name,py$school)) ## Desiree name = &amp;quot;Kibbee&amp;quot; print(r.name,name) ## Desiree Kibbee list=[&amp;#39;d&amp;#39;,&amp;#39;e&amp;#39;,&amp;#39;s&amp;#39;,&amp;#39;i&amp;#39;,&amp;#39;r&amp;#39;,&amp;#39;e&amp;#39;,&amp;#39;e&amp;#39;,&amp;#39;k&amp;#39;,&amp;#39;i&amp;#39;,&amp;#39;b&amp;#39;,&amp;#39;b&amp;#39;,&amp;#39;e&amp;#39;,&amp;#39;e&amp;#39;] list[7:] ## [&amp;#39;k&amp;#39;, &amp;#39;i&amp;#39;, &amp;#39;b&amp;#39;, &amp;#39;b&amp;#39;, &amp;#39;e&amp;#39;, &amp;#39;e&amp;#39;] list[0:7] ## [&amp;#39;d&amp;#39;, &amp;#39;e&amp;#39;, &amp;#39;s&amp;#39;, &amp;#39;i&amp;#39;, &amp;#39;r&amp;#39;, &amp;#39;e&amp;#39;, &amp;#39;e&amp;#39;] list[12]=1 list[0:] ## [&amp;#39;d&amp;#39;, &amp;#39;e&amp;#39;, &amp;#39;s&amp;#39;, &amp;#39;i&amp;#39;, &amp;#39;r&amp;#39;, &amp;#39;e&amp;#39;, &amp;#39;e&amp;#39;, &amp;#39;k&amp;#39;, &amp;#39;i&amp;#39;, &amp;#39;b&amp;#39;, &amp;#39;b&amp;#39;, &amp;#39;e&amp;#39;, 1] activities=[&amp;#39;dance&amp;#39;, &amp;#39;netflix&amp;#39;, &amp;#39;school&amp;#39;] print(activities) ## [&amp;#39;dance&amp;#39;, &amp;#39;netflix&amp;#39;, &amp;#39;school&amp;#39;] list3=[list,activities] print(list3) ## [[&amp;#39;d&amp;#39;, &amp;#39;e&amp;#39;, &amp;#39;s&amp;#39;, &amp;#39;i&amp;#39;, &amp;#39;r&amp;#39;, &amp;#39;e&amp;#39;, &amp;#39;e&amp;#39;, &amp;#39;k&amp;#39;, &amp;#39;i&amp;#39;, &amp;#39;b&amp;#39;, &amp;#39;b&amp;#39;, &amp;#39;e&amp;#39;, 1], [&amp;#39;dance&amp;#39;, &amp;#39;netflix&amp;#39;, &amp;#39;school&amp;#39;]] import numpy as np measurements=np.</description>
     </item>
     
   </channel>

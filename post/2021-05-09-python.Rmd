@@ -1,0 +1,46 @@
+---
+title: Python
+author: 'Desiree Kibbee'
+date: '2021-05-09'
+slug: python
+categories: []
+tags: []
+description: 'Python Reticulate'
+---
+![](/post/2021-05-09-python_files/042021.Desiree.UTSenior.70.jpg)
+
+```{R}
+library(reticulate)
+name <- "Desiree"
+school<-"UT"
+area<-"Austin"
+cat(c(name,py$name))
+cat(c(name,py$name,py$school))
+```
+
+```{python}
+name = "Kibbee"
+print(r.name,name)
+
+list=['d','e','s','i','r','e','e','k','i','b','b','e','e']
+list[7:]
+list[0:7]
+list[12]=1
+list[0:]
+activities=['dance', 'netflix', 'school']
+print(activities)
+list3=[list,activities]
+print(list3)
+
+import numpy as np 
+measurements=np.array([30,29,44])
+print(measurements)
+measurements_cm=(measurements*2.54)
+print(measurements_cm)
+
+school="UT"
+area="Austin"
+school[0:]+area[0]
+
+print(name, r.school, r.area)
+```
