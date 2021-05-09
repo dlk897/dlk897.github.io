@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="author" content="Desiree Kibbee" />
+    
+    <link rel="shortcut icon" type="image/x-icon" href="../../img/favicon.ico">
+    <title>Project 1: Exploratory Data Analysis</title>
+    <meta name="generator" content="Hugo 0.83.1" />
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css" href="../../css/main.css" />
+    <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" />
+    <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:200,400,200bold,400old" />
+    
+    <!--[if lt IE 9]>
+			<script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+			<script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+		<![endif]-->
+
+    
+  </head>
+
+  <body>
+    <div id="wrap">
+      
+      <nav class="navbar navbar-default">
+  <div class="container">
+    <div class="navbar-header">
+      <a class="navbar-brand" href="../../"><i class="fa fa-home"></i></a>
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+    </div>
+    <div class="navbar-collapse collapse" id="navbar">
+      <ul class="nav navbar-nav navbar-right">
+      
+        
+        <li><a href="../../post/">BLOG</a></li>
+        
+        <li><a href="../../projects/">PROJECTS</a></li>
+        
+        <li><a href="../../resume/">RESUME</a></li>
+        
+      
+      </ul>
+    </div>
+  </div>
+</nav>
+
+      <div class="container">
+        <div class="blog-post">
+          <h3>
+            <strong><a href="../../project/project1/">Project 1: Exploratory Data Analysis</a></strong>
+          </h3>
+        </div>
+ 
+<div class="blog-title">
+          <h4>
+         January 1, 0001 
+            &nbsp;&nbsp;
+            
+          </h4>
+        </div>
+
+        <div class="panel panel-default">
+          <div class="panel-body">
+            <div class="blogpost">
+              
+<script src="../../rmarkdown-libs/htmlwidgets/htmlwidgets.js"></script>
+<script src="../../rmarkdown-libs/plotly-binding/plotly.js"></script>
+<script src="../../rmarkdown-libs/typedarray/typedarray.min.js"></script>
+<script src="../../rmarkdown-libs/jquery/jquery.min.js"></script>
+<link href="../../rmarkdown-libs/crosstalk/css/crosstalk.css" rel="stylesheet" />
+<script src="../../rmarkdown-libs/crosstalk/js/crosstalk.min.js"></script>
+<link href="../../rmarkdown-libs/plotly-htmlwidgets-css/plotly-htmlwidgets.css" rel="stylesheet" />
+<script src="../../rmarkdown-libs/plotly-main/plotly-latest.min.js"></script>
+
+
+<div id="desiree-kibbee-eid-dlk897" class="section level2">
+<h2>Desiree Kibbee EID: dlk897</h2>
+</div>
+<div id="data-wrangling" class="section level2">
+<h2>Data Wrangling</h2>
+<p><em>For this project I have created two datasets. The first dataset is called txstatistics, from the CDC website I chose 50 random texas cities and documented their 2019 population (population variable), the percent of persons with a bachelors degree or higher (percent_bach variable), and the average household income for 2019 (avg_income variable). The second dataset is called txhomevalues; from Zillow.com I downloaded an Excel sheet of the average home values per month in 2019 and 2020 for every Texas city and then removed any city that wasn’t one of the 50 I chose in the first dataset. I chose the first dataset because it was my Biostats project and I chose the Zillow real estate dataset because I too hope to buy a home in Texas someday. From these two datasets I expect a strong association between the average home value and average household income because people who make more can afford more expensive homes. I also expect a strong association between percent of persons with a bachelors degree and average income because that is the relationship I found in my Biostats project.</em></p>
+<pre class="r"><code>library(tidyverse)
+
+txstatistics &lt;- read.csv(&quot;~/Project/txstatistics.csv&quot;)
+txhomevalues &lt;- read.csv(&quot;~/Project/txhomevalues.csv&quot;)
+# 1. Tidy Data
+txstatistics %&gt;% pivot_wider(names_from = city, values_from = avg_income) %&gt;% 
+    pivot_longer(1:50, names_to = &quot;city&quot;, values_to = &quot;avg_income&quot;)</code></pre>
+<pre><code>## # A tibble: 2,500 x 4
+##     Waco `Wichita Falls` city         avg_income
+##    &lt;int&gt;           &lt;int&gt; &lt;chr&gt;             &lt;dbl&gt;
+##  1    NA              NA population     123420  
+##  2    NA              NA percent_bach       23.5
+##  3    NA              NA Abilene         50659  
+##  4    NA              NA Amarillo           NA  
+##  5    NA              NA Arlington          NA  
+##  6    NA              NA Austin             NA  
+##  7    NA              NA Beaumont           NA  
+##  8    NA              NA Bellaire           NA  
+##  9    NA              NA Bellmead           NA  
+## 10    NA              NA Big Spring         NA  
+## # … with 2,490 more rows</code></pre>
+<pre class="r"><code>txhomevalues %&gt;% pivot_longer(contains(&quot;.&quot;), names_to = &quot;Date&quot;, 
+    values_to = &quot;home_value&quot;) %&gt;% separate(Date, into = c(&quot;month&quot;, 
+    &quot;year&quot;))</code></pre>
+<pre><code>## # A tibble: 1,200 x 5
+##    city    State month year  home_value
+##    &lt;fct&gt;   &lt;fct&gt; &lt;chr&gt; &lt;chr&gt;      &lt;int&gt;
+##  1 Abilene TX    Jan   2019      134088
+##  2 Abilene TX    Feb   2019      134271
+##  3 Abilene TX    Mar   2019      134473
+##  4 Abilene TX    Apr   2019      134844
+##  5 Abilene TX    May   2019      135201
+##  6 Abilene TX    Jun   2019      135388
+##  7 Abilene TX    Jul   2019      135521
+##  8 Abilene TX    Aug   2019      136207
+##  9 Abilene TX    Sep   2019      136927
+## 10 Abilene TX    Oct   2019      137398
+## # … with 1,190 more rows</code></pre>
+<pre class="r"><code>txhome_tidy &lt;- txhomevalues %&gt;% pivot_longer(contains(&quot;.&quot;), names_to = &quot;Date&quot;, 
+    values_to = &quot;home_value&quot;) %&gt;% separate(Date, into = c(&quot;month&quot;, 
+    &quot;year&quot;))</code></pre>
+<p><em>The txstatistics dataset did not need to be tidy. The txhomevalues dataset did need to be tidy because month and year were combined as one variable and the average home value wasn’t it’s own variable. So I pivoted longer taking the names Month.Year to a column called date and the values to it’s own column called home_value. Then I had to separate the months and the year because they were both within the new “Date” variable I created. So I used the separate function to separate the Month.Year by the period, which is the default R setting, into two new columns called “month” and “year.”</em></p>
+</div>
+<div id="join-data" class="section level2">
+<h2>Join Data</h2>
+<pre class="r"><code>inner_join(txhome_tidy, txstatistics)</code></pre>
+<pre><code>## # A tibble: 1,200 x 8
+##    city    State month year  home_value avg_income population percent_bach
+##    &lt;fct&gt;   &lt;fct&gt; &lt;chr&gt; &lt;chr&gt;      &lt;int&gt;      &lt;int&gt;      &lt;int&gt;        &lt;dbl&gt;
+##  1 Abilene TX    Jan   2019      134088      50659     123420         23.5
+##  2 Abilene TX    Feb   2019      134271      50659     123420         23.5
+##  3 Abilene TX    Mar   2019      134473      50659     123420         23.5
+##  4 Abilene TX    Apr   2019      134844      50659     123420         23.5
+##  5 Abilene TX    May   2019      135201      50659     123420         23.5
+##  6 Abilene TX    Jun   2019      135388      50659     123420         23.5
+##  7 Abilene TX    Jul   2019      135521      50659     123420         23.5
+##  8 Abilene TX    Aug   2019      136207      50659     123420         23.5
+##  9 Abilene TX    Sep   2019      136927      50659     123420         23.5
+## 10 Abilene TX    Oct   2019      137398      50659     123420         23.5
+## # … with 1,190 more rows</code></pre>
+<pre class="r"><code>txstatistics %&gt;% summarize(n_distinct(city))</code></pre>
+<pre><code>##   n_distinct(city)
+## 1               50</code></pre>
+<pre class="r"><code>tx_join &lt;- inner_join(txhome_tidy, txstatistics)</code></pre>
+<p><em>There were 1200 observations in the txhome_tidy data set and 50 observations in the txstatistics dataset. I did an inner join with the two datasets because I only want to see the cities that are in both data sets. After summarizing all distinct cities it appears that all 50 cities in the txstatistics dataset were in the txhome_tidy dataset so no observations were dropped.</em></p>
+</div>
+<div id="explore-data" class="section level2">
+<h2>Explore Data</h2>
+<pre class="r"><code>tx_join %&gt;% group_by(city) %&gt;% select(home_value, avg_income) %&gt;% 
+    filter(avg_income &gt; 61745.92 &amp; home_value &gt; 213121.5) %&gt;% 
+    summarize_all(max) %&gt;% arrange(desc(avg_income))</code></pre>
+<pre><code>## # A tibble: 9 x 3
+##   city            home_value avg_income
+##   &lt;fct&gt;                &lt;int&gt;      &lt;int&gt;
+## 1 University Park    1500953     224485
+## 2 Bellaire            908477     206734
+## 3 Terrell Hills       721054     181979
+## 4 Friendswood         333867     111478
+## 5 Cedar Park          393495     104019
+## 6 Midland             273306      79329
+## 7 Austin              469568      71576
+## 8 Irving              254721      64868
+## 9 Fort Worth          226118      62187</code></pre>
+<pre class="r"><code>tx_join %&gt;% group_by(month) %&gt;% summarize(min(home_value))</code></pre>
+<pre><code>## # A tibble: 12 x 2
+##    month `min(home_value)`
+##    &lt;chr&gt;             &lt;int&gt;
+##  1 Apr               56820
+##  2 Aug               57764
+##  3 Dec               60457
+##  4 Feb               56059
+##  5 Jan               55818
+##  6 Jul               57859
+##  7 Jun               57821
+##  8 Mar               56438
+##  9 May               57367
+## 10 Nov               59141
+## 11 Oct               58150
+## 12 Sep               57553</code></pre>
+<pre class="r"><code>tx_join %&gt;% group_by(city) %&gt;% mutate(avg_home_value = mean(home_value)) %&gt;% 
+    arrange(desc(avg_home_value))</code></pre>
+<pre><code>## # A tibble: 1,200 x 9
+## # Groups:   city [50]
+##    city  State month year  home_value avg_income population percent_bach
+##    &lt;fct&gt; &lt;fct&gt; &lt;chr&gt; &lt;chr&gt;      &lt;int&gt;      &lt;int&gt;      &lt;int&gt;        &lt;dbl&gt;
+##  1 Univ… TX    Jan   2019     1429200     224485      24985         87.8
+##  2 Univ… TX    Feb   2019     1430456     224485      24985         87.8
+##  3 Univ… TX    Mar   2019     1430815     224485      24985         87.8
+##  4 Univ… TX    Apr   2019     1431177     224485      24985         87.8
+##  5 Univ… TX    May   2019     1431156     224485      24985         87.8
+##  6 Univ… TX    Jun   2019     1431910     224485      24985         87.8
+##  7 Univ… TX    Jul   2019     1432619     224485      24985         87.8
+##  8 Univ… TX    Aug   2019     1434119     224485      24985         87.8
+##  9 Univ… TX    Sep   2019     1437813     224485      24985         87.8
+## 10 Univ… TX    Oct   2019     1431290     224485      24985         87.8
+## # … with 1,190 more rows, and 1 more variable: avg_home_value &lt;dbl&gt;</code></pre>
+</div>
+<div id="create-summary-statistics" class="section level2">
+<h2>Create summary statistics</h2>
+<pre class="r"><code># Summary Statistics using group_by
+tx_join %&gt;% group_by(city) %&gt;% select(home_value) %&gt;% summarize(n())</code></pre>
+<pre><code>## # A tibble: 50 x 2
+##    city        `n()`
+##    &lt;fct&gt;       &lt;int&gt;
+##  1 Abilene        24
+##  2 Amarillo       24
+##  3 Arlington      24
+##  4 Austin         24
+##  5 Beaumont       24
+##  6 Bellaire       24
+##  7 Bellmead       24
+##  8 Big Spring     24
+##  9 Brady          24
+## 10 Brownsville    24
+## # … with 40 more rows</code></pre>
+<pre class="r"><code>tx_join %&gt;% group_by(year) %&gt;% select(avg_income) %&gt;% summarize(n())</code></pre>
+<pre><code>## # A tibble: 2 x 2
+##   year  `n()`
+##   &lt;chr&gt; &lt;int&gt;
+## 1 2019    600
+## 2 2020    600</code></pre>
+<pre class="r"><code>tx_join %&gt;% group_by(city) %&gt;% select(population) %&gt;% summarize(n())</code></pre>
+<pre><code>## # A tibble: 50 x 2
+##    city        `n()`
+##    &lt;fct&gt;       &lt;int&gt;
+##  1 Abilene        24
+##  2 Amarillo       24
+##  3 Arlington      24
+##  4 Austin         24
+##  5 Beaumont       24
+##  6 Bellaire       24
+##  7 Bellmead       24
+##  8 Big Spring     24
+##  9 Brady          24
+## 10 Brownsville    24
+## # … with 40 more rows</code></pre>
+<pre class="r"><code>tx_join %&gt;% group_by(year) %&gt;% select(percent_bach) %&gt;% summarize(n())</code></pre>
+<pre><code>## # A tibble: 2 x 2
+##   year  `n()`
+##   &lt;chr&gt; &lt;int&gt;
+## 1 2019    600
+## 2 2020    600</code></pre>
+<pre class="r"><code>tx_join %&gt;% group_by(year, city) %&gt;% summarize_all(mean)</code></pre>
+<pre><code>## # A tibble: 100 x 8
+## # Groups:   year [2]
+##    year  city        State month home_value avg_income population percent_bach
+##    &lt;chr&gt; &lt;fct&gt;       &lt;dbl&gt; &lt;dbl&gt;      &lt;dbl&gt;      &lt;dbl&gt;      &lt;dbl&gt;        &lt;dbl&gt;
+##  1 2019  Abilene        NA    NA    135623.      50659     123420         23.5
+##  2 2019  Amarillo       NA    NA    137111.      52725     199371         23.7
+##  3 2019  Arlington      NA    NA    213750.      60571     398854         30.3
+##  4 2019  Austin         NA    NA    404084.      71576     978908         51.7
+##  5 2019  Beaumont       NA    NA    112979.      50632     116825         24.5
+##  6 2019  Bellaire       NA    NA    898136.     206734      18971         79.6
+##  7 2019  Bellmead       NA    NA     81185.      41696      10744         12.2
+##  8 2019  Big Spring     NA    NA    119864.      52275      28187         11.5
+##  9 2019  Brady          NA    NA    105968.      44951       5302         12.3
+## 10 2019  Brownsville    NA    NA    100067.      38588     182781         18.9
+## # … with 90 more rows</code></pre>
+<pre class="r"><code>tx_join %&gt;% group_by(year) %&gt;% select_if(is.numeric) %&gt;% summarize_all(sd)</code></pre>
+<pre><code>## # A tibble: 2 x 5
+##   year  home_value avg_income population percent_bach
+##   &lt;chr&gt;      &lt;dbl&gt;      &lt;dbl&gt;      &lt;dbl&gt;        &lt;dbl&gt;
+## 1 2019     226829.     39221.    443837.         16.7
+## 2 2020     227888.     39221.    443837.         16.7</code></pre>
+<pre class="r"><code>tx_join %&gt;% group_by(year) %&gt;% select_if(is.numeric) %&gt;% summarize_all(var)</code></pre>
+<pre><code>## # A tibble: 2 x 5
+##   year    home_value  avg_income    population percent_bach
+##   &lt;chr&gt;        &lt;dbl&gt;       &lt;dbl&gt;         &lt;dbl&gt;        &lt;dbl&gt;
+## 1 2019  51451610892. 1538300986. 196991232561.         281.
+## 2 2020  51932817505. 1538300986. 196991232561.         281.</code></pre>
+<pre class="r"><code>tx_join %&gt;% group_by(year) %&gt;% select_if(is.numeric) %&gt;% summarize_all(quantile)</code></pre>
+<pre><code>## # A tibble: 10 x 5
+## # Groups:   year [2]
+##    year  home_value avg_income population percent_bach
+##    &lt;chr&gt;      &lt;dbl&gt;      &lt;dbl&gt;      &lt;dbl&gt;        &lt;dbl&gt;
+##  1 2019      55818      32544        5302         10.9
+##  2 2019     109394.     44951       18971         17.4
+##  3 2019     140764.     51294.      65969         23.8
+##  4 2019     213614.     60582      199371         30.3
+##  5 2019    1437813     224485     2320268         87.8
+##  6 2020      61229      32544        5302         10.9
+##  7 2020     115250.     44951       18971         17.4
+##  8 2020     149050      51294.      65969         23.8
+##  9 2020     226212.     60582      199371         30.3
+## 10 2020    1500953     224485     2320268         87.8</code></pre>
+<pre class="r"><code>tx_join %&gt;% group_by(year) %&gt;% select_if(is.numeric) %&gt;% summarize_all(min)</code></pre>
+<pre><code>## # A tibble: 2 x 5
+##   year  home_value avg_income population percent_bach
+##   &lt;chr&gt;      &lt;int&gt;      &lt;int&gt;      &lt;int&gt;        &lt;dbl&gt;
+## 1 2019       55818      32544       5302         10.9
+## 2 2020       61229      32544       5302         10.9</code></pre>
+<pre class="r"><code>tx_join %&gt;% group_by(year) %&gt;% select_if(is.numeric) %&gt;% summarize_all(max)</code></pre>
+<pre><code>## # A tibble: 2 x 5
+##   year  home_value avg_income population percent_bach
+##   &lt;chr&gt;      &lt;int&gt;      &lt;int&gt;      &lt;int&gt;        &lt;dbl&gt;
+## 1 2019     1437813     224485    2320268         87.8
+## 2 2020     1500953     224485    2320268         87.8</code></pre>
+<pre class="r"><code>tx_join %&gt;% group_by(year) %&gt;% select_if(is.numeric) %&gt;% summarize_all(n_distinct)</code></pre>
+<pre><code>## # A tibble: 2 x 5
+##   year  home_value avg_income population percent_bach
+##   &lt;chr&gt;      &lt;int&gt;      &lt;int&gt;      &lt;int&gt;        &lt;int&gt;
+## 1 2019         597         50         50           47
+## 2 2020         600         50         50           47</code></pre>
+<pre class="r"><code>tx_join %&gt;% group_by(year) %&gt;% summarize(cor(home_value, avg_income))</code></pre>
+<pre><code>## # A tibble: 2 x 2
+##   year  `cor(home_value, avg_income)`
+##   &lt;chr&gt;                         &lt;dbl&gt;
+## 1 2019                          0.939
+## 2 2020                          0.935</code></pre>
+<pre class="r"><code>tx_join %&gt;% group_by(year) %&gt;% summarize(cor(population, percent_bach))</code></pre>
+<pre><code>## # A tibble: 2 x 2
+##   year  `cor(population, percent_bach)`
+##   &lt;chr&gt;                           &lt;dbl&gt;
+## 1 2019                            0.106
+## 2 2020                            0.106</code></pre>
+<pre class="r"><code># Overall Statistics
+tx_join %&gt;% select(home_value) %&gt;% summarize(n())</code></pre>
+<pre><code>## # A tibble: 1 x 1
+##   `n()`
+##   &lt;int&gt;
+## 1  1200</code></pre>
+<pre class="r"><code>tx_join %&gt;% select(avg_income) %&gt;% summarize(n())</code></pre>
+<pre><code>## # A tibble: 1 x 1
+##   `n()`
+##   &lt;int&gt;
+## 1  1200</code></pre>
+<pre class="r"><code>tx_join %&gt;% select(population) %&gt;% summarize(n())</code></pre>
+<pre><code>## # A tibble: 1 x 1
+##   `n()`
+##   &lt;int&gt;
+## 1  1200</code></pre>
+<pre class="r"><code>tx_join %&gt;% select(percent_bach) %&gt;% summarize(n())</code></pre>
+<pre><code>## # A tibble: 1 x 1
+##   `n()`
+##   &lt;int&gt;
+## 1  1200</code></pre>
+<pre class="r"><code>tx_join %&gt;% summarize_all(mean)</code></pre>
+<pre><code>## # A tibble: 1 x 8
+##    city State month  year home_value avg_income population percent_bach
+##   &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;      &lt;dbl&gt;      &lt;dbl&gt;      &lt;dbl&gt;        &lt;dbl&gt;
+## 1    NA    NA    NA    NA    213121.     61746.    235029.         27.5</code></pre>
+<pre class="r"><code>tx_join %&gt;% select_if(is.numeric) %&gt;% summarize_all(sd)</code></pre>
+<pre><code>## # A tibble: 1 x 4
+##   home_value avg_income population percent_bach
+##        &lt;dbl&gt;      &lt;dbl&gt;      &lt;dbl&gt;        &lt;dbl&gt;
+## 1    227296.     39205.    443652.         16.7</code></pre>
+<pre class="r"><code>tx_join %&gt;% select_if(is.numeric) %&gt;% summarize_all(var)</code></pre>
+<pre><code>## # A tibble: 1 x 4
+##     home_value  avg_income    population percent_bach
+##          &lt;dbl&gt;       &lt;dbl&gt;         &lt;dbl&gt;        &lt;dbl&gt;
+## 1 51663690198. 1537018000. 196826936287.         280.</code></pre>
+<pre class="r"><code>tx_join %&gt;% select_if(is.numeric) %&gt;% summarize_all(quantile)</code></pre>
+<pre><code>## # A tibble: 5 x 4
+##   home_value avg_income population percent_bach
+##        &lt;dbl&gt;      &lt;dbl&gt;      &lt;dbl&gt;        &lt;dbl&gt;
+## 1     55818      32544        5302         10.9
+## 2    111885.     44951       18971         17.4
+## 3    145912.     51294.      65969         23.8
+## 4    221354.     60582      199371         30.3
+## 5   1500953     224485     2320268         87.8</code></pre>
+<pre class="r"><code>tx_join %&gt;% select_if(is.numeric) %&gt;% summarize_all(min)</code></pre>
+<pre><code>## # A tibble: 1 x 4
+##   home_value avg_income population percent_bach
+##        &lt;int&gt;      &lt;int&gt;      &lt;int&gt;        &lt;dbl&gt;
+## 1      55818      32544       5302         10.9</code></pre>
+<pre class="r"><code>tx_join %&gt;% select_if(is.numeric) %&gt;% summarize_all(max)</code></pre>
+<pre><code>## # A tibble: 1 x 4
+##   home_value avg_income population percent_bach
+##        &lt;int&gt;      &lt;int&gt;      &lt;int&gt;        &lt;dbl&gt;
+## 1    1500953     224485    2320268         87.8</code></pre>
+<pre class="r"><code>tx_join %&gt;% select_if(is.numeric) %&gt;% summarize_all(n_distinct)</code></pre>
+<pre><code>## # A tibble: 1 x 4
+##   home_value avg_income population percent_bach
+##        &lt;int&gt;      &lt;int&gt;      &lt;int&gt;        &lt;int&gt;
+## 1       1195         50         50           47</code></pre>
+<pre class="r"><code>tx_join %&gt;% summarize(cor(home_value, avg_income))</code></pre>
+<pre><code>## # A tibble: 1 x 1
+##   `cor(home_value, avg_income)`
+##                           &lt;dbl&gt;
+## 1                         0.937</code></pre>
+<pre class="r"><code>tx_join %&gt;% summarize(cor(population, percent_bach))</code></pre>
+<pre><code>## # A tibble: 1 x 1
+##   `cor(population, percent_bach)`
+##                             &lt;dbl&gt;
+## 1                           0.106</code></pre>
+<p><em>The first thing I did to explore my dataset is find the city with the highest average income that is above the overall average income of all the cities and above the overall average home value of all the cities. That city was University Park, TX. Also I discovered that the month with the lowest average home value across all cities and both years is January which makes sense because most people don’t sell/buy houses at the very beginning of the year. Finally I created a new variable that averaged all of the average home values by city. No surprise University Park has the highest home value averaged across every month of both years. After exploring my data I made summary statistics for each numeric variable, average home value, average income, population, and percent of persons with a bachelors degree. I did this overall and after grouping by one or two categorical variables. There is a lot of deviation from the mean for each of the variables. Also as expected the minimum income has a low percent of persons with a bachelors degree and the maximum income has a relatively high percent of persons with a bachelors degree. It is no surprise then that home value and average income have a high correlation. Population and percent of persons with a bachelors degree has a relatively low correlation which is interesting, it’s hard to say whether large cities should have high percent bachelors because they generally have universities and small towns usually lack access to quality education or if large cities would have less bachelors degrees due to steep costs of living.</em></p>
+</div>
+<div id="make-visualizations-three-plots" class="section level2">
+<h2>Make visualizations (three plots)</h2>
+<pre class="r"><code>tx_cor &lt;- tx_join %&gt;% select_if(is.numeric) %&gt;% cor()
+tx_cor %&gt;% as.data.frame %&gt;% rownames_to_column(&quot;var1&quot;) %&gt;% pivot_longer(-1, 
+    names_to = &quot;var2&quot;, values_to = &quot;correlation&quot;) %&gt;% ggplot(aes(var1, 
+    var2, fill = correlation)) + geom_tile() + geom_text(aes(label = round(correlation, 
+    2)), color = &quot;white&quot;, size = 4) + coord_fixed() + ggtitle(&quot;Correlation Heatmap for Data on Cities in Texas&quot;) + 
+    ylab(&quot;Variables 2&quot;) + xlab(&quot;Variables 1&quot;)</code></pre>
+<p><img src="../../project/project1_files/figure-html/unnamed-chunk-5-1.png" width="672" style="display: block; margin: auto;" />
+<em>The correlation heat map shows that there is a very strong correlation between percentage of people with a bachelors degre and average income for a particular city (0.9). Also there is a strong correlation between percentage of people with a bachelors degree and the average home value for a particular city (0.9). The last strong correlation is between the average income per year and the average home value for a particular city (0.94). There is almost no correlation between population and average income per year (-0.08). Finally, there is 0 correlation between population and average home value.</em></p>
+<pre class="r"><code>tx_join %&gt;% group_by(city) %&gt;% mutate(avg_home_value = mean(home_value)) %&gt;% 
+    ggplot(aes(avg_income, avg_home_value)) + geom_point(aes(color = population), 
+    size = 2) + scale_color_gradient(low = &quot;white&quot;, high = &quot;blue&quot;) + 
+    geom_smooth(method = &quot;lm&quot;) + ggtitle(&quot;Average Home Value vs. Avgerage Income in Texas Cities&quot;) + 
+    ylab(&quot;Avgerage Home Value ($)&quot;) + xlab(&quot;Average Income per Year ($)&quot;)</code></pre>
+<p><img src="../../project/project1_files/figure-html/unnamed-chunk-6-1.png" width="672" style="display: block; margin: auto;" />
+<em>The graph above creates a clear visual representation of the strong correlation between average income per year and average home value in texas cities. Additionally, it is clear that there is little to no relationship between population and our x and y variables because small population are seen at low income/home value and high income/home value. It appears that large populations are at the lower end and that could be because large cities typically contain a large amount of homelessness, high cost of living, job scarcity, etc.</em></p>
+<pre class="r"><code>tx_join %&gt;% mutate(avg_income_grouped = case_when(avg_income &lt; 
+    60000 ~ &quot;Low&quot;, avg_income &gt; 1e+05 ~ &quot;High&quot;, avg_income &lt;= 
+    1e+05 &amp; 600 &lt;= avg_income ~ &quot;Med&quot;)) %&gt;% mutate(avg_bach = case_when(percent_bach &lt; 
+    27.468 ~ &quot;Below Average&quot;, percent_bach &gt; 27.468 ~ &quot;Above Average&quot;)) %&gt;% 
+    filter(!duplicated(avg_income)) %&gt;% ggplot(aes(avg_income_grouped, 
+    fill = avg_bach)) + geom_bar(aes(y = home_value), position = &quot;dodge&quot;, 
+    stat = &quot;summary&quot;) + ggtitle(&quot;Avgerage Income and Percent Bachelors Degrees in Texas Cities&quot;) + 
+    ylab(&quot;Average Home Value ($)&quot;) + xlab(&quot;Average Income per Year ($)&quot;) + 
+    scale_fill_brewer(&quot;Percent Bachelors&quot;, palette = 8)</code></pre>
+<p><img src="../../project/project1_files/figure-html/unnamed-chunk-7-1.png" width="672" style="display: block; margin: auto;" />
+<em>The graph above shows the relationship between average home value, average income per year, and percent of persons with a bachelors degree or higher. For the cities with high average incomes they only contained above the average percent of person with a bachelors degree. Surprisingly there were more cities in the low income group with above average bachelors degrees but these cities did have the lowest home values as expected. This is the relationship we would expect based on our correlation heatmap and knowing that people with a college degree tend to make more than those with no degree so they can afford more expensive homes.</em></p>
+</div>
+<div id="dimensionality-reduction" class="section level2">
+<h2>Dimensionality Reduction</h2>
+<pre class="r"><code>library(cluster)
+tx_numeric &lt;- tx_join %&gt;% select_if(is.numeric) %&gt;% filter(!duplicated(avg_income))
+
+sil_width &lt;- vector()
+for (i in 2:10) {
+    kms &lt;- kmeans(tx_numeric, centers = i)
+    sil &lt;- silhouette(kms$cluster, dist(tx_numeric))
+    sil_width[i] &lt;- mean(sil[, 3])
+}
+ggplot() + geom_line(aes(x = 1:10, y = sil_width)) + scale_x_continuous(name = &quot;k&quot;, 
+    breaks = 1:10)</code></pre>
+<p><img src="../../project/project1_files/figure-html/unnamed-chunk-8-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>pam_tx &lt;- tx_join %&gt;% select_if(is.numeric) %&gt;% filter(!duplicated(avg_income)) %&gt;% 
+    scale %&gt;% pam(k = 2)
+pam_tx</code></pre>
+<pre><code>## Medoids:
+##      ID home_value avg_income population percent_bach
+## [1,]  1 -0.3135435 -0.2800693 -0.2491445   -0.2347153
+## [2,]  6  3.0615485  3.6625781 -0.4823056    3.0837138
+## Clustering vector:
+##  [1] 1 1 1 1 1 2 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+## [39] 1 1 1 1 1 2 1 1 2 1 1 1
+## Objective function:
+##     build      swap 
+## 0.9240844 0.9240844 
+## 
+## Available components:
+##  [1] &quot;medoids&quot;    &quot;id.med&quot;     &quot;clustering&quot; &quot;objective&quot;  &quot;isolation&quot; 
+##  [6] &quot;clusinfo&quot;   &quot;silinfo&quot;    &quot;diss&quot;       &quot;call&quot;       &quot;data&quot;</code></pre>
+<pre class="r"><code>plot(pam_tx, which = 2)</code></pre>
+<p><img src="../../project/project1_files/figure-html/unnamed-chunk-8-2.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>final_tx &lt;- tx_numeric %&gt;% mutate(cluster = pam_tx$clustering)
+final_tx</code></pre>
+<pre><code>## # A tibble: 50 x 5
+##    home_value avg_income population percent_bach cluster
+##         &lt;int&gt;      &lt;int&gt;      &lt;int&gt;        &lt;dbl&gt;   &lt;int&gt;
+##  1     134088      50659     123420         23.5       1
+##  2     135485      52725     199371         23.7       1
+##  3     209390      60571     398854         30.3       1
+##  4     394776      71576     978908         51.7       1
+##  5     111531      50632     116825         24.5       1
+##  6     907836     206734      18971         79.6       2
+##  7      76395      41696      10744         12.2       1
+##  8     115536      52275      28187         11.5       1
+##  9     103087      44951       5302         12.3       1
+## 10      98227      38588     182781         18.9       1
+## # … with 40 more rows</code></pre>
+<pre class="r"><code>library(plotly)
+final_tx %&gt;% plot_ly(x = ~home_value, y = ~avg_income, z = ~percent_bach, 
+    color = ~cluster, type = &quot;scatter3d&quot;, mode = &quot;markers&quot;)</code></pre>
+<div id="htmlwidget-1" style="width:672px;height:480px;" class="plotly html-widget"></div>
+<script type="application/json" data-for="htmlwidget-1">{"x":{"visdat":{"17d83ccee3b4":["function () ","plotlyVisDat"]},"cur_data":"17d83ccee3b4","attrs":{"17d83ccee3b4":{"x":{},"y":{},"z":{},"mode":"markers","color":{},"alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"type":"scatter3d"}},"layout":{"margin":{"b":40,"l":60,"t":25,"r":10},"scene":{"xaxis":{"title":"home_value"},"yaxis":{"title":"avg_income"},"zaxis":{"title":"percent_bach"}},"hovermode":"closest","showlegend":false,"legend":{"yanchor":"top","y":0.5}},"source":"A","config":{"showSendToCloud":false},"data":[{"x":[134088,135485,209390,394776,111531,907836,76395,115536,103087,98227,341278,158637,220443,134016,73211,203127,305457,223683,203878,102231,76379,185624,92301,228836,172116,237734,131947,66121,176835,143045,107638,138809,265449,116847,126197,170979,86909,108553,55818,65348,138329,182626,220693,676580,125130,146318,1429200,146021,131168,96568],"y":[50659,52725,60571,71576,50632,206734,41696,52275,44951,38588,104019,56333,52580,47568,35994,62187,111478,49319,61211,39752,44444,52338,56800,64868,46793,48446,53964,36904,47593,50453,48588,46804,79329,64870,36553,63847,32544,60582,36557,33084,51928,52455,40370,181979,45080,52932,224485,54192,40190,47476],"z":[23.5,23.7,30.3,51.7,24.5,79.6,12.2,11.5,12.3,18.9,50.1,22.2,33.4,25.1,11,29.7,48.6,29.2,22.9,17.7,18.2,32.9,17.4,37.7,10.9,28.7,16.9,14.9,19.4,31.5,21.7,30.3,28.9,13.9,29.9,18.5,15,11,11.7,13.9,24.7,26,33.5,77.9,23.3,29.4,87.8,20.7,24.9,23.8],"mode":"markers","type":"scatter3d","marker":{"colorbar":{"title":"cluster","ticklen":2},"cmin":1,"cmax":2,"colorscale":[["0","rgba(68,1,84,1)"],["0.0416666666666667","rgba(70,19,97,1)"],["0.0833333333333333","rgba(72,32,111,1)"],["0.125","rgba(71,45,122,1)"],["0.166666666666667","rgba(68,58,128,1)"],["0.208333333333333","rgba(64,70,135,1)"],["0.25","rgba(60,82,138,1)"],["0.291666666666667","rgba(56,93,140,1)"],["0.333333333333333","rgba(49,104,142,1)"],["0.375","rgba(46,114,142,1)"],["0.416666666666667","rgba(42,123,142,1)"],["0.458333333333333","rgba(38,133,141,1)"],["0.5","rgba(37,144,140,1)"],["0.541666666666667","rgba(33,154,138,1)"],["0.583333333333333","rgba(39,164,133,1)"],["0.625","rgba(47,174,127,1)"],["0.666666666666667","rgba(53,183,121,1)"],["0.708333333333333","rgba(79,191,110,1)"],["0.75","rgba(98,199,98,1)"],["0.791666666666667","rgba(119,207,85,1)"],["0.833333333333333","rgba(147,214,70,1)"],["0.875","rgba(172,220,52,1)"],["0.916666666666667","rgba(199,225,42,1)"],["0.958333333333333","rgba(226,228,40,1)"],["1","rgba(253,231,37,1)"]],"showscale":false,"color":[1,1,1,1,1,2,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,2,1,1,2,1,1,1],"line":{"colorbar":{"title":"","ticklen":2},"cmin":1,"cmax":2,"colorscale":[["0","rgba(68,1,84,1)"],["0.0416666666666667","rgba(70,19,97,1)"],["0.0833333333333333","rgba(72,32,111,1)"],["0.125","rgba(71,45,122,1)"],["0.166666666666667","rgba(68,58,128,1)"],["0.208333333333333","rgba(64,70,135,1)"],["0.25","rgba(60,82,138,1)"],["0.291666666666667","rgba(56,93,140,1)"],["0.333333333333333","rgba(49,104,142,1)"],["0.375","rgba(46,114,142,1)"],["0.416666666666667","rgba(42,123,142,1)"],["0.458333333333333","rgba(38,133,141,1)"],["0.5","rgba(37,144,140,1)"],["0.541666666666667","rgba(33,154,138,1)"],["0.583333333333333","rgba(39,164,133,1)"],["0.625","rgba(47,174,127,1)"],["0.666666666666667","rgba(53,183,121,1)"],["0.708333333333333","rgba(79,191,110,1)"],["0.75","rgba(98,199,98,1)"],["0.791666666666667","rgba(119,207,85,1)"],["0.833333333333333","rgba(147,214,70,1)"],["0.875","rgba(172,220,52,1)"],["0.916666666666667","rgba(199,225,42,1)"],["0.958333333333333","rgba(226,228,40,1)"],["1","rgba(253,231,37,1)"]],"showscale":false,"color":[1,1,1,1,1,2,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,2,1,1,2,1,1,1]}},"frame":null},{"x":[55818,1429200],"y":[32544,224485],"type":"scatter3d","mode":"markers","opacity":0,"hoverinfo":"none","showlegend":false,"marker":{"colorbar":{"title":"cluster","ticklen":2,"len":0.5,"lenmode":"fraction","y":1,"yanchor":"top"},"cmin":1,"cmax":2,"colorscale":[["0","rgba(68,1,84,1)"],["0.0416666666666667","rgba(70,19,97,1)"],["0.0833333333333333","rgba(72,32,111,1)"],["0.125","rgba(71,45,122,1)"],["0.166666666666667","rgba(68,58,128,1)"],["0.208333333333333","rgba(64,70,135,1)"],["0.25","rgba(60,82,138,1)"],["0.291666666666667","rgba(56,93,140,1)"],["0.333333333333333","rgba(49,104,142,1)"],["0.375","rgba(46,114,142,1)"],["0.416666666666667","rgba(42,123,142,1)"],["0.458333333333333","rgba(38,133,141,1)"],["0.5","rgba(37,144,140,1)"],["0.541666666666667","rgba(33,154,138,1)"],["0.583333333333333","rgba(39,164,133,1)"],["0.625","rgba(47,174,127,1)"],["0.666666666666667","rgba(53,183,121,1)"],["0.708333333333333","rgba(79,191,110,1)"],["0.75","rgba(98,199,98,1)"],["0.791666666666667","rgba(119,207,85,1)"],["0.833333333333333","rgba(147,214,70,1)"],["0.875","rgba(172,220,52,1)"],["0.916666666666667","rgba(199,225,42,1)"],["0.958333333333333","rgba(226,228,40,1)"],["1","rgba(253,231,37,1)"]],"showscale":true,"color":[1,2],"line":{"color":"rgba(255,127,14,1)"}},"z":[10.9,87.8],"frame":null}],"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.2,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+<p><em>The first step in my code selects only the numeric variables and then removes any duplicate avg_income so I only have one row for each city. The next step I conducted a silhouette width analysis to decide how many clusters I should have based on maximizing the cohesion within a cluster and separation between the clusters. The silhouette analysis shows I should have 2 clusters giving an average silhouette width of 0.77 which is strong. Then I scales my variables and created my PAM clusters to ignore any outliers. Then I mutated my data to add the clusters as a variables. Then I visualized my clusters with a 3-D plot shoiwing average income, home values, and percent of persons with a bachelors degree. As you can see the two clusters show that low average income, low home value, and low percent bachelors are one cluster and high average income, high home value, and high percent bachelors is the other cluster.</em></p>
+<pre class="r"><code>## paste this chunk into the ```{r setup} chunk at the top of
+## your project 1 .Rmd file
+
+knitr::opts_chunk$set(echo = TRUE, eval = TRUE, fig.align = &quot;center&quot;, 
+    warning = F, message = F, tidy = TRUE, tidy.opts = list(width.cutoff = 60), 
+    R.options = list(max.print = 100))</code></pre>
+<p>…</p>
+</div>
+
+            
+        <hr>         <div class="related-posts">
+                <h5>Related Posts</h5>
+                
+              </div> 
+            </div>
+          </div>
+
+   <hr>  <div class="disqus">
+  <div id="disqus_thread"></div>
+  <script type="text/javascript">
+
+    (function() {
+      
+      
+      if (window.location.hostname == "localhost")
+        return;
+
+      var disqus_shortname = '';
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+  </script>
+  <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  <a href="http://disqus.com/" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</div> 
+        </div>
+      </div>
+    </div>
+
+    
+    <footer>
+  <div id="footer">
+    <div class="container">
+      <p class="text-muted">&copy; All rights reserved. Powered by <a href="https://gohugo.io/">Hugo</a> and
+      <a href="http://www.github.com/nurlansu/hugo-sustain/">sustain</a> with ♥</p>
+    </div>
+  </div>
+</footer>
+<div class="footer"></div>
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+<script src="../../js/docs.min.js"></script>
+<script src="../../js/main.js"></script>
+
+<script src="../../js/ie10-viewport-bug-workaround.js"></script>
+
+
+    
+  </body>
+</html>

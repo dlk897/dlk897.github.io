@@ -1,0 +1,162 @@
+---
+title: 'Project 1: Exploratory Data Analysis'
+author: "SDS348"
+date: ''
+output:
+  html_document:
+    toc: yes
+    toc_float:
+      collapsed: no
+      smooth_scroll: yes
+  pdf_document:
+    toc: no
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, eval = TRUE, fig.align = "center", warning = F, message = F,
+tidy=TRUE, tidy.opts=list(width.cutoff=60), R.options=list(max.print=100))
+```
+
+## Desiree Kibbee EID: dlk897
+
+## Data Wrangling
+
+*For this project I have created two datasets. The first dataset is called txstatistics, from the CDC website I chose 50 random texas cities and documented their 2019 population (population variable), the percent of persons with a bachelors degree or higher (percent_bach variable), and the average household income for 2019 (avg_income variable). The second dataset is called txhomevalues; from Zillow.com I downloaded an Excel sheet of the average home values per month in 2019 and 2020 for every Texas city and then removed any city that wasn't one of the 50 I chose in the first dataset. I chose the first dataset because it was my Biostats project and I chose the Zillow real estate dataset because I too hope to buy a home in Texas someday. From these two datasets I expect a strong association between the average home value and average household income because people who make more can afford more expensive homes. I also expect a strong association between percent of persons with a bachelors degree and average income because that is the relationship I found in my Biostats project.*
+
+```{R}
+library(tidyverse)
+
+txstatistics <- read.csv("~/Project/txstatistics.csv")
+txhomevalues <- read.csv("~/Project/txhomevalues.csv")
+#1. Tidy Data
+txstatistics %>% pivot_wider(names_from=city, values_from=avg_income) %>% 
+  pivot_longer(1:50, names_to="city", values_to="avg_income")
+
+txhomevalues %>% pivot_longer(contains("."), names_to="Date", values_to="home_value")%>% separate(Date,into=c("month","year")) 
+txhome_tidy <- txhomevalues %>% pivot_longer(contains("."), names_to="Date", values_to="home_value") %>% separate(Date,into=c("month","year")) 
+
+```
+*The txstatistics dataset did not need to be tidy. The txhomevalues dataset did need to be tidy because month and year were combined as one variable and the average home value wasn't it's own variable. So I pivoted longer taking the names Month.Year to a column called date and the values to it's own column called home_value. Then I had to separate the months and the year because they were both within the new "Date" variable I created. So I used the separate function to separate the Month.Year by the period, which is the default R setting, into two new columns called "month" and "year."*
+
+## Join Data
+```{R}
+
+inner_join(txhome_tidy,txstatistics) 
+txstatistics %>% summarize(n_distinct(city))
+
+tx_join <-inner_join(txhome_tidy,txstatistics)
+
+```
+*There were 1200 observations in the txhome_tidy data set and 50 observations in the txstatistics dataset. I did an inner join with the two datasets because I only want to see the cities that are in both data sets. After summarizing all distinct cities it appears that all 50 cities in the txstatistics dataset were in the txhome_tidy dataset so no observations were dropped.*
+
+## Explore Data
+```{R}
+tx_join %>% group_by(city) %>% select(home_value, avg_income) %>% 
+  filter(avg_income>61745.92 & home_value>213121.5) %>% summarize_all(max) %>%
+  arrange(desc(avg_income)) 
+
+tx_join %>% group_by(month) %>% summarize(min(home_value))
+
+tx_join %>% group_by(city) %>% mutate(avg_home_value=mean(home_value)) %>%
+  arrange(desc(avg_home_value))
+
+```
+
+## Create summary statistics
+```{R}
+#Summary Statistics using group_by
+tx_join %>% group_by(city) %>% select(home_value) %>% summarize(n())
+
+tx_join %>% group_by(year) %>% select(avg_income) %>% summarize(n())
+
+tx_join %>% group_by(city) %>% select(population) %>% summarize(n())
+
+tx_join %>% group_by(year) %>% select(percent_bach) %>% summarize(n())
+
+tx_join %>% group_by(year, city) %>% summarize_all(mean) 
+tx_join %>% group_by(year) %>% select_if(is.numeric) %>% summarize_all(sd)
+tx_join %>% group_by(year) %>% select_if(is.numeric) %>% summarize_all(var)
+tx_join %>% group_by(year) %>% select_if(is.numeric) %>% summarize_all(quantile)
+tx_join %>% group_by(year) %>% select_if(is.numeric) %>% summarize_all(min)
+tx_join %>% group_by(year) %>% select_if(is.numeric) %>% summarize_all(max)
+tx_join %>% group_by(year) %>% select_if(is.numeric) %>% summarize_all(n_distinct)
+tx_join %>% group_by(year) %>% summarize(cor(home_value, avg_income))
+tx_join %>% group_by(year) %>% summarize(cor(population, percent_bach))
+
+
+#Overall Statistics
+tx_join %>% select(home_value) %>% summarize(n())
+
+tx_join %>% select(avg_income) %>% summarize(n())
+
+tx_join %>% select(population) %>% summarize(n())
+
+tx_join %>% select(percent_bach) %>% summarize(n())
+
+tx_join %>% summarize_all(mean) 
+tx_join %>% select_if(is.numeric) %>% summarize_all(sd)
+tx_join %>% select_if(is.numeric) %>% summarize_all(var)
+tx_join %>% select_if(is.numeric) %>% summarize_all(quantile)
+tx_join %>% select_if(is.numeric) %>% summarize_all(min)
+tx_join %>% select_if(is.numeric) %>% summarize_all(max)
+tx_join %>% select_if(is.numeric) %>% summarize_all(n_distinct)
+tx_join %>% summarize(cor(home_value, avg_income))
+tx_join %>% summarize(cor(population, percent_bach))
+
+```
+*The first thing I did to explore my dataset is find the city with the highest average income that is above the overall average income of all the cities and above the overall average home value of all the cities. That city was University Park, TX. Also I discovered that the month with the lowest average home value across all cities and both years is January which makes sense because most people don't sell/buy houses at the very beginning of the year. Finally I created a new variable that averaged all of the average home values by city. No surprise University Park has the highest home value averaged across every month of both years. After exploring my data I made summary statistics for each numeric variable, average home value, average income, population, and percent of persons with a bachelors degree. I did this overall and after grouping by one or two categorical variables. There is a lot of deviation from the mean for each of the variables. Also as expected the minimum income has a low percent of persons with a bachelors degree and the maximum income has a relatively high percent of persons with a bachelors degree. It is no surprise then that home value and average income have a high correlation. Population and percent of persons with a bachelors degree has a relatively low correlation which is interesting, it's hard to say whether large cities should have high percent bachelors because they generally have universities and small towns usually lack access to quality education or if large cities would have less bachelors degrees due to steep costs of living.*
+
+## Make visualizations (three plots)
+```{R}
+tx_cor <- tx_join %>% select_if(is.numeric) %>% cor()
+tx_cor %>% as.data.frame %>% rownames_to_column("var1") %>% pivot_longer(-1, names_to="var2", values_to="correlation") %>% ggplot(aes(var1, var2, fill=correlation)) + geom_tile() + geom_text(aes(label=round(correlation,2)),color = "white", size = 4) + coord_fixed() + ggtitle("Correlation Heatmap for Data on Cities in Texas") + ylab("Variables 2") + xlab("Variables 1")
+```
+*The correlation heat map shows that there is a very strong correlation between percentage of people with a bachelors degre and average income for a particular city (0.9). Also there is a strong correlation between percentage of people with a bachelors degree and the average home value for a particular city (0.9). The last strong correlation is between the average income per year and the average home value for a particular city (0.94). There is almost no correlation between population and average income per year (-0.08). Finally, there is 0 correlation between population and average home value.*
+
+```{R}
+tx_join %>% group_by(city) %>% mutate(avg_home_value=mean(home_value)) %>% ggplot(aes(avg_income, avg_home_value)) + geom_point(aes(color=population), size=2) + scale_color_gradient(low="white", high="blue") + geom_smooth(method="lm") + ggtitle("Average Home Value vs. Avgerage Income in Texas Cities") + ylab("Avgerage Home Value ($)") + xlab("Average Income per Year ($)")
+```
+*The graph above creates a clear visual representation of the strong correlation between average income per year and average home value in texas cities. Additionally, it is clear that there is little to no relationship between population and our x and y variables because small population are seen at low income/home value and high income/home value. It appears that large populations are at the lower end and that could be because large cities typically contain a large amount of homelessness, high cost of living, job scarcity, etc.*
+
+```{R}
+tx_join %>% mutate(avg_income_grouped = case_when(avg_income<60000 ~ "Low", avg_income>100000 ~ "High", avg_income<=100000 & 600<=avg_income ~ "Med")) %>% mutate(avg_bach = case_when(percent_bach<27.468 ~ "Below Average", percent_bach>27.468 ~ "Above Average")) %>% filter(!duplicated(avg_income)) %>% ggplot(aes(avg_income_grouped, fill=avg_bach)) + geom_bar(aes(y=home_value), position="dodge", stat="summary") + ggtitle("Avgerage Income and Percent Bachelors Degrees in Texas Cities") + ylab("Average Home Value ($)") + xlab("Average Income per Year ($)") + scale_fill_brewer("Percent Bachelors", palette=8)
+
+```
+*The graph above shows the relationship between average home value, average income per year, and percent of persons with a bachelors degree or higher. For the cities with high average incomes they only contained above the average percent of person with a bachelors degree. Surprisingly there were more cities in the low income group with above average bachelors degrees but these cities did have the lowest home values as expected. This is the relationship we would expect based on our correlation heatmap and knowing that people with a college degree tend to make more than those with no degree so they can afford more expensive homes.*
+
+## Dimensionality Reduction
+```{R}
+library(cluster)
+tx_numeric <- tx_join %>% select_if(is.numeric) %>% filter(!duplicated(avg_income))
+
+sil_width<-vector()
+for(i in 2:10){  
+  kms <- kmeans(tx_numeric,centers=i)
+  sil <- silhouette(kms$cluster,dist(tx_numeric)) 
+  sil_width[i]<-mean(sil[,3])
+}
+ggplot()+geom_line(aes(x=1:10,y=sil_width))+scale_x_continuous(name="k",breaks=1:10)
+
+
+pam_tx<- tx_join %>% select_if(is.numeric) %>% filter(!duplicated(avg_income)) %>% scale %>% pam(k=2)
+pam_tx
+plot(pam_tx, which=2)
+final_tx <- tx_numeric %>% mutate(cluster=pam_tx$clustering)
+final_tx
+
+library(plotly)
+final_tx%>%plot_ly(x= ~home_value,  y = ~avg_income, z = ~percent_bach, color= ~cluster,
+        type = "scatter3d", mode = "markers")
+```
+    
+*The first step in my code selects only the numeric variables and then removes any duplicate avg_income so I only have one row for each city. The next step I conducted a silhouette width analysis to decide how many clusters I should have based on maximizing the cohesion within a cluster and separation between the clusters. The silhouette analysis shows I should have 2 clusters giving an average silhouette width of 0.77 which is strong. Then I scales my variables and created my PAM clusters to ignore any outliers. Then I mutated my data to add the clusters as a variables. Then I visualized my clusters with a 3-D plot shoiwing average income, home values, and percent of persons with a bachelors degree. As you can see the two clusters show that low average income, low home value, and low percent bachelors are one cluster and high average income, high home value, and high percent bachelors is the other cluster.*
+
+
+```{r eval=F}
+## paste this chunk into the ```{r setup} chunk at the top of your project 1 .Rmd file
+
+knitr::opts_chunk$set(echo = TRUE, eval = TRUE, fig.align = "center", warning = F, message = F,
+tidy=TRUE, tidy.opts=list(width.cutoff=60), R.options=list(max.print=100))
+```
+
+...
